@@ -26,8 +26,10 @@ struct Suffix_Automaton{
 		State*p = last, *np = cur++;
 		np->mx = p->mx + 1;
 		
-		for(;p && !p->go[w]; p = p->par)
+		while(p && p->go[w] == 0){
 			p->go[w] = np;
+			p = p->par;
+		}
 		
 		if(!p)
 			np->par = root;
@@ -41,8 +43,10 @@ struct Suffix_Automaton{
 				nq->mx = p->mx + 1;
 				nq->par = q->par;
 				q->par = np->par = nq;
-				for(;p && p->go[w] == q; p = p->go[w])
+				while(p && p->go[w] == q){
 					p->go[w] = nq;
+					p = p->par;
+				}
 			}
 		}
 		last = np;
@@ -63,17 +67,12 @@ struct Suffix_Automaton{
 		for(char*pt = buf; *pt; ++pt){
 			int w = *pt - 'a';
 			
-			if(t->go[w])
-				t = t->go[w], ++l;
-			else{
-				for(;t && !t->go[w]; t = t->par);
-				if(!t)
-					l = 0, t = root;
-				else{
-					l = t->mx + 1;
-					t = t->go[w];
-				}
+			while(t && t->go[w] == 0){
+				t = t->par;
+				if(t)l = t->mx;
 			}
+			if(t == 0) l = 0, t = root;
+			else ++l, t = t->go[w];
 			
 			if(ans < l)
 				ans = l;
@@ -86,9 +85,9 @@ struct Suffix_Automaton{
 int main(){
 	scanf("%s", buf);
 	sam.build(buf);
+
 	scanf("%s", buf);
 	printf("%d\n", sam.LCS(buf));
+	
 	return 0;
 }
-
-
