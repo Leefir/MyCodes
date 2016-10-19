@@ -77,7 +77,7 @@ void input(){
 
 namespace st{
 	int seq[N * 2 + 5], seqtot;
-	int pos[N + 5], dep[N + 5];
+	int pos[N + 5];
 	ll dist[N + 5];//with edge val!
 	
 	void dfs(int u, int par){
@@ -88,7 +88,6 @@ namespace st{
 			int v = edge[i].to;
 			if(v == par) continue;
 			
-			dep[v] = dep[u] + 1;
 			dist[v] = dist[u] + edge[i].val;
 			dfs(v, u);
 			seq[seqtot++] = u;
@@ -96,8 +95,8 @@ namespace st{
 		
 	}
 	
-	inline int min(int x, int y){
-		if(dep[x] < dep[y]) return x;
+	inline ll min(ll x, ll y){
+		if(x < y) return x;
 		return y;
 	}
 	
@@ -109,21 +108,17 @@ namespace st{
 	const int S = 19;
 	int mi[N * 2 + 5][S];
 	
-	inline int lca(int u, int v){
+	inline ll dis(int u, int v){
 		int l = pos[u], r = pos[v];
 		if(l > r) swap(l, r);
 		
 		int k = lg[r - l + 1];
-		return min(mi[l][k], mi[r - (1 << k) + 1][k]);
-	}
-	
-	inline ll dis(int u, int v){
-		return dist[u] + dist[v] - dist[lca(u, v)] * 2;
+		return dist[u] + dist[v] - min(mi[l][k], mi[r - (1 << k) + 1][k]) * 2;
 	}
 	
 	void build(){
 		seqtot = 0;
-		dep[0] = dist[0] = 0;
+		dist[0] = 0;
 		dfs(0, -1);
 		
 		//lg
@@ -131,7 +126,7 @@ namespace st{
 		rep(i, 2, seqtot + 1) lg[i] = lg[i >> 1] + 1;
 		
 		//mi
-		rep(i, 0, seqtot) mi[i][0] = seq[i];
+		rep(i, 0, seqtot) mi[i][0] = dist[seq[i]];
 		rep(i, 1, S) for(int j = 0; j + (1 << i) <= seqtot; ++j)
 			mi[j][i] = min(mi[j][i - 1], mi[j + (1 << i - 1)][i - 1]);
 			 
