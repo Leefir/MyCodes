@@ -213,7 +213,7 @@ namespace dt{
 		
 	}
 	
-	ll query(int u, int lim){
+	ll query(int u, int L, int R){
 		ll res = 0;
 		
 		for(int v = u, pre = -1; v != -1; pre = v, v = fa[v]){
@@ -222,11 +222,12 @@ namespace dt{
 				if(son[v][i].first == pre) continue;
 				vector<pil> &vec = son[v][i].second;
 				
-				vector<pil>::iterator it = upper_bound(vec.begin(), vec.end(), pil(lim, 1LL<<60));
-				int cnt = it - vec.begin();
-				if(cnt) res += (--it)->second + cnt * st::dis(u, v);
+				vector<pil>::iterator itr = upper_bound(vec.begin(), vec.end(), pil(R, 1LL<<60));
+				vector<pil>::iterator itl = lower_bound(vec.begin(), vec.end(), pil(L, -1));
+				int cnt = itr - itl;
+				if(cnt) res += (--itr)->second - (itl == vec.begin()? 0 : (--itl)->second) + cnt * st::dis(u, v);
 			}
-			if(x[v] <= lim) res += st::dis(u, v);
+			if(L <= x[v] && x[v] <= R) res += st::dis(u, v);
 		}
 		
 		return res;
@@ -239,11 +240,6 @@ namespace dt{
 void build(){
 	st::build();
 	dt::build();
-}
-
-ll work(int u, int L, int R){
-	return dt::query(u, R) - dt::query(u, L - 1);
-	//L - 1 may cause -1 !
 }
 
 void solve(){
@@ -266,7 +262,7 @@ R=max(a%A,b%A)。对于第 2到第 Q行，假设前一行得到的方便值为 a
 R=max((a+ans)%A,(b+ans)%A)。 
 	*/
 		
-		ans = work(u, L, R);
+		ans = dt::query(u, L, R);
 		print(ans);putchar('\n');
 	}
 	
