@@ -72,8 +72,7 @@ void Main(){
 
 } //namespace Program
 
-/*
-
+/*相邻交换，找不到其它方法。。但不会证。。
 */
 int main(){
 	Program::Main();
